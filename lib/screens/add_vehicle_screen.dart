@@ -93,7 +93,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ajouter une annonce'),
-        backgroundColor: Colors.blue[700],
+        backgroundColor: Colors.orange[700],
         foregroundColor: Colors.white,
       ),
       body: Form(

@@ -16,6 +16,7 @@ import 'services/api_auth_service.dart';
 
 // Utils
 import 'utils/demo_data.dart';
+import 'utils/modern_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,11 +33,8 @@ class OccazCarDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'OccazCar - Demo UI',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      title: 'OccazCar - Voitures d\'occasion',
+      theme: ModernTheme.lightTheme,
       home: const DemoHomeScreen(),
       debugShowCheckedModeBanner: false,
       routes: {
@@ -55,10 +53,26 @@ class DemoHomeScreen extends StatefulWidget {
   State<DemoHomeScreen> createState() => _DemoHomeScreenState();
 }
 
-class _DemoHomeScreenState extends State<DemoHomeScreen> {
+class _DemoHomeScreenState extends State<DemoHomeScreen> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   bool _isLoggedIn = false;
   List<Map<String, dynamic>> _userVehicles = [];
+  late AnimationController _fabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fabController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _fabController.dispose();
+    super.dispose();
+  }
 
   Future<void> _handleAddVehicle() async {
     final result = await Navigator.pushNamed(context, '/add-vehicle');
@@ -68,9 +82,36 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Annonce ajoutée avec succès !'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.white24,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Annonce ajoutée avec succès !',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: ModernTheme.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
           ),
         );
       }
@@ -114,53 +155,162 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('OccazCar'),
-        centerTitle: true,
-        backgroundColor: Colors.blue[700],
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {},
+      extendBody: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: ModernTheme.primaryGradient,
+            boxShadow: [
+              BoxShadow(
+                color: ModernTheme.primaryOrange.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
+          child: AppBar(
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.directions_car_rounded,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'OccazCar',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            foregroundColor: Colors.white,
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {},
+                  tooltip: 'Notifications',
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: screens[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Accueil',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.search),
-            label: 'Rechercher',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.add_circle_outline),
-            selectedIcon: Icon(Icons.add_circle),
-            label: 'Vendre',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          height: 70,
+          backgroundColor: Colors.white,
+          indicatorColor: ModernTheme.primaryOrange.withOpacity(0.15),
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: [
+            NavigationDestination(
+              icon: Icon(
+                Icons.home_outlined,
+                color: ModernTheme.darkGray,
+              ),
+              selectedIcon: ShaderMask(
+                shaderCallback: (bounds) => ModernTheme.primaryGradient.createShader(bounds),
+                child: const Icon(
+                  Icons.home_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              label: 'Accueil',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.search_outlined,
+                color: ModernTheme.darkGray,
+              ),
+              selectedIcon: ShaderMask(
+                shaderCallback: (bounds) => ModernTheme.primaryGradient.createShader(bounds),
+                child: const Icon(
+                  Icons.search_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              label: 'Rechercher',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.add_circle_outline,
+                color: ModernTheme.darkGray,
+              ),
+              selectedIcon: ShaderMask(
+                shaderCallback: (bounds) => ModernTheme.primaryGradient.createShader(bounds),
+                child: const Icon(
+                  Icons.add_circle_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              label: 'Vendre',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.person_outline_rounded,
+                color: ModernTheme.darkGray,
+              ),
+              selectedIcon: ShaderMask(
+                shaderCallback: (bounds) => ModernTheme.primaryGradient.createShader(bounds),
+                child: const Icon(
+                  Icons.person_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              label: 'Profil',
+            ),
+          ],
+        ),
       ),
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton.extended(
               onPressed: _handleAddVehicle,
-              icon: const Icon(Icons.add),
-              label: const Text('Publier une annonce'),
+              elevation: 6,
+              backgroundColor: ModernTheme.primaryOrange,
+              icon: const Icon(Icons.add_circle_rounded, color: Colors.white),
+              label: const Text(
+                'Vendre',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
             )
           : null,
     );

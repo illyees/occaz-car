@@ -102,13 +102,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_add, size: 80, color: Colors.blue[700]),
+                  Icon(Icons.person_add, size: 80, color: Colors.orange[700]),
                   const SizedBox(height: 24),
                   Text(
                     'Inscription',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue[700],
+                          color: Colors.orange[700],
                         ),
                   ),
                   const SizedBox(height: 8),

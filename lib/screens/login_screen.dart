@@ -82,13 +82,13 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.directions_car, size: 100, color: Colors.blue[700]),
+                Icon(Icons.directions_car, size: 100, color: Colors.orange[700]),
                 const SizedBox(height: 24),
                 Text(
                   'OccazCar',
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue[700],
+                        color: Colors.orange[700],
                       ),
                 ),
                 const SizedBox(height: 8),
