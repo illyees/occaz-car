@@ -93,30 +93,19 @@ class VehicleCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.phone),
-                        label: const Text('Contacter'),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/vehicle-details',
-                            arguments: vehicle,
-                          );
-                        },
-                        icon: const Icon(Icons.visibility),
-                        label: const Text('Détails'),
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/vehicle-details',
+                        arguments: vehicle,
+                      );
+                    },
+                    icon: const Icon(Icons.visibility),
+                    label: const Text('Détails'),
+                  ),
                 ),
               ],
             ),

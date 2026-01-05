@@ -60,7 +60,6 @@ class ProfileScreen extends StatelessWidget {
             context,
             icon: Icons.favorite,
             title: 'Mes favoris',
-            badge: '3',
             onTap: () {},
           ),
           _buildProfileOption(
