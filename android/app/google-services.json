@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "794233629740",
+    "project_id": "occazcar-e7978",
+    "storage_bucket": "occazcar-e7978.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794233629740:android:a66f5c5ffe5ae6b2607589",
+        "android_client_info": {
+          "package_name": "com.example.occaz_car"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8Ndw3kkXV6ip1T7F5ic7OIj5tmqXsHoI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
