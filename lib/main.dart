@@ -11,10 +11,18 @@ import 'screens/profile_settings_screen.dart';
 import 'widgets/profile_screen.dart';
 import 'widgets/my_vehicles_screen.dart';
 
+// Services
+import 'services/api_auth_service.dart';
+
 // Utils
 import 'utils/demo_data.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize API service and load stored JWT token
+  await ApiAuthService().initialize();
+  
   runApp(const OccazCarDemo());
 }
 
@@ -51,7 +59,6 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   int _selectedIndex = 0;
   bool _isLoggedIn = false;
   List<Map<String, dynamic>> _userVehicles = [];
-  final List<Map<String, dynamic>> _demoVehicles = DemoData.vehiclesMaps;
 
   Future<void> _handleAddVehicle() async {
     final result = await Navigator.pushNamed(context, '/add-vehicle');
@@ -96,7 +103,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     }
 
     final List<Widget> screens = [
-      VehiclesListScreen(vehicles: _demoVehicles),
+      const VehiclesListScreen(),
       const Center(child: Text('Recherche (à venir)')),
       MyVehiclesScreen(
         userVehicles: _userVehicles,

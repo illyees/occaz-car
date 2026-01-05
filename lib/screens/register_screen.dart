@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   final VoidCallback onRegister;
@@ -18,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -29,20 +31,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
-      // Afficher un message de succès
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Inscription réussie !'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      
-      // Retour à l'écran de connexion après un court délai
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pop(context);
-      });
+      setState(() => _isLoading = true);
+
+      try {
+        final response = await ApiAuthService().register(
+          nom: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          telephone: _phoneController.text.trim(),
+        );
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+
+          if (response['success']) {
+            // Registration successful
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Inscription réussie ! Vous pouvez maintenant vous connecter.'),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            // Return to login screen after a short delay
+            Future.delayed(const Duration(seconds: 1), () {
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            });
+          } else {
+            // Registration failed
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(response['message'] ?? 'Erreur lors de l\'inscription'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -83,6 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   // Nom complet
                   TextFormField(
                     controller: _nameController,
+                    enabled: !_isLoading,
                     decoration: InputDecoration(
                       labelText: 'Nom complet',
                       prefixIcon: const Icon(Icons.person),
@@ -103,6 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    enabled: !_isLoading,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       prefixIcon: const Icon(Icons.email),
@@ -126,6 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
+                    enabled: !_isLoading,
                     decoration: InputDecoration(
                       labelText: 'Téléphone',
                       prefixIcon: const Icon(Icons.phone),
@@ -146,6 +188,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
+                    enabled: !_isLoading,
                     decoration: InputDecoration(
                       labelText: 'Mot de passe',
                       prefixIcon: const Icon(Icons.lock),
@@ -179,6 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
+                    enabled: !_isLoading,
                     decoration: InputDecoration(
                       labelText: 'Confirmer le mot de passe',
                       prefixIcon: const Icon(Icons.lock_outline),
@@ -212,14 +256,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: _handleRegister,
+                      onPressed: _isLoading ? null : _handleRegister,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('S\'inscrire'),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text('S\'inscrire'),
                     ),
                   ),
                   const SizedBox(height: 16),
