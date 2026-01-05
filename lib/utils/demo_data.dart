@@ -11,7 +11,9 @@ class DemoData {
       'carburant': 'Essence',
       'boite': 'Manuelle',
       'ville': 'Tunis',
-      'image': 'https://via.placeholder.com/400x300.png?text=Renault+Clio',
+      'image': 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80',
+      'vendeurNom': 'Ahmed Ben Salah',
+      'vendeurTel': '+216 98 765 432',
     },
     {
       'marque': 'Peugeot',
@@ -22,7 +24,9 @@ class DemoData {
       'carburant': 'Diesel',
       'boite': 'Automatique',
       'ville': 'Sfax',
-      'image': 'https://via.placeholder.com/400x300.png?text=Peugeot+208',
+      'image': 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800&q=80',
+      'vendeurNom': 'Fatma Trabelsi',
+      'vendeurTel': '+216 22 456 789',
     },
     {
       'marque': 'Volkswagen',
@@ -33,7 +37,9 @@ class DemoData {
       'carburant': 'Diesel',
       'boite': 'Manuelle',
       'ville': 'Sousse',
-      'image': 'https://via.placeholder.com/400x300.png?text=VW+Golf',
+      'image': 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80',
+      'vendeurNom': 'Mohamed Gharbi',
+      'vendeurTel': '+216 55 123 456',
     },
     {
       'marque': 'Toyota',
@@ -44,7 +50,9 @@ class DemoData {
       'carburant': 'Hybride',
       'boite': 'Automatique',
       'ville': 'Tunis',
-      'image': 'https://via.placeholder.com/400x300.png?text=Toyota+Corolla',
+      'image': 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800&q=80',
+      'vendeurNom': 'Youssef Mansour',
+      'vendeurTel': '+216 24 789 123',
     },
     {
       'marque': 'BMW',
@@ -55,7 +63,9 @@ class DemoData {
       'carburant': 'Diesel',
       'boite': 'Automatique',
       'ville': 'Monastir',
-      'image': 'https://via.placeholder.com/400x300.png?text=BMW+Serie+3',
+      'image': 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80',
+      'vendeurNom': 'Sami Bouazizi',
+      'vendeurTel': '+216 52 345 678',
     },
   ];
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VehicleDetailsScreen extends StatelessWidget {
   const VehicleDetailsScreen({super.key});
@@ -142,21 +143,21 @@ class VehicleDetailsScreen extends StatelessWidget {
                                 ),
                           ),
                           const SizedBox(height: 12),
-                          const Row(
+                          Row(
                             children: [
-                              CircleAvatar(
+                              const CircleAvatar(
                                 radius: 25,
                                 child: Icon(Icons.person),
                               ),
-                              SizedBox(width: 12),
+                              const SizedBox(width: 12),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Mohamed Ali',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    vehicle['vendeurNom'] ?? 'Vendeur',
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  Text(
+                                  const Text(
                                     'Membre depuis 2023',
                                     style: TextStyle(fontSize: 12, color: Colors.grey),
                                   ),
@@ -191,7 +192,15 @@ class VehicleDetailsScreen extends StatelessWidget {
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  final tel = vehicle['vendeurTel'] ?? '';
+                  if (tel.isNotEmpty) {
+                    final uri = Uri.parse('tel:$tel');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    }
+                  }
+                },
                 icon: const Icon(Icons.phone),
                 label: const Text('Appeler'),
                 style: OutlinedButton.styleFrom(

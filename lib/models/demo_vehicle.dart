@@ -8,6 +8,8 @@ class DemoVehicle {
   final String boite;
   final String ville;
   final String image;
+  final String vendeurNom;
+  final String vendeurTel;
 
   DemoVehicle({
     required this.marque,
@@ -19,6 +21,8 @@ class DemoVehicle {
     required this.boite,
     required this.ville,
     required this.image,
+    required this.vendeurNom,
+    required this.vendeurTel,
   });
 
   factory DemoVehicle.fromMap(Map<String, dynamic> map) {
@@ -32,6 +36,8 @@ class DemoVehicle {
       boite: map['boite'] as String,
       ville: map['ville'] as String,
       image: map['image'] as String,
+      vendeurNom: map['vendeurNom'] as String,
+      vendeurTel: map['vendeurTel'] as String,
     );
   }
 
@@ -46,6 +52,8 @@ class DemoVehicle {
       'boite': boite,
       'ville': ville,
       'image': image,
+      'vendeurNom': vendeurNom,
+      'vendeurTel': vendeurTel,
     };
   }
 
