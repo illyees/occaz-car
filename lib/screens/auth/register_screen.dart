@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
-import '../../services/mock_auth_service.dart';
-import '../../services/mongodb_auth_service.dart';
 
 class ModernRegisterScreen extends StatefulWidget {
   const ModernRegisterScreen({Key? key}) : super(key: key);
@@ -56,17 +54,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
 
       setState(() => _isLoading = true);
 
-      // Détecter automatiquement le service (mock, MongoDB, ou Firebase)
-      dynamic authService;
-      try {
-        authService = Provider.of<MockAuthService>(context, listen: false);
-      } catch (_) {
-        try {
-          authService = Provider.of<MongoDBAuthService>(context, listen: false);
-        } catch (_) {
-          authService = Provider.of<AuthService>(context, listen: false);
-        }
-      }
+      final authService = Provider.of<AuthService>(context, listen: false);
       String? error = await authService.register(
         email: _emailController.text.trim(),
         password: _passwordController.text,

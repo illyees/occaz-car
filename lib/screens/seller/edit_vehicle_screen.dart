@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../services/database_service.dart';
-import '../../services/mock_database_service.dart';
-import '../../services/mongodb_database_service.dart';
 import '../../models/vehicle_model.dart';
 
 class EditVehicleScreen extends StatefulWidget {
@@ -16,18 +13,7 @@ class EditVehicleScreen extends StatefulWidget {
 
 class _EditVehicleScreenState extends State<EditVehicleScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  dynamic _getDbService(BuildContext context) {
-    try {
-      return Provider.of<MockDatabaseService>(context, listen: false);
-    } catch (_) {
-      try {
-        return Provider.of<MongoDBDatabaseService>(context, listen: false);
-      } catch (_) {
-        return DatabaseService();
-      }
-    }
-  }
+  final DatabaseService _dbService = DatabaseService();
 
   late TextEditingController _brandController;
   late TextEditingController _modelController;
@@ -83,8 +69,7 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
       'location': _locationController.text.trim(),
     };
 
-    final dbService = _getDbService(context);
-    String? error = await dbService.updateVehicle(widget.vehicle.id, updates);
+    String? error = await _dbService.updateVehicle(widget.vehicle.id, updates);
 
     setState(() => _isLoading = false);
 

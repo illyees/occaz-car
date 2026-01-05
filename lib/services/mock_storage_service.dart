@@ -1,37 +1,25 @@
-import 'dart:io';
-
-/// Service de stockage mock pour tester sans Firebase Storage
 class MockStorageService {
-  Future<String?> uploadImage(File image, String path) async {
-    // Simuler un délai d'upload
-    await Future.delayed(const Duration(seconds: 2));
-    
-    // Retourner une URL mockée (utilise une image placeholder)
-    return 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800';
+  Future<String?> uploadImageFile(dynamic imageFile, String path) async {
+    await Future.delayed(const Duration(seconds: 1));
+    // Retourne une URL d'image placeholder
+    return 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800';
   }
 
-  Future<List<String>> uploadMultipleImages(List<File> images, String path) async {
-    List<String> imageUrls = [];
-    for (File image in images) {
-      String? url = await uploadImage(image, path);
-      if (url != null) {
-        imageUrls.add(url);
-      }
-    }
-    return imageUrls;
+  Future<String?> uploadImage(dynamic image, String path) async {
+    return uploadImageFile(image, path);
+  }
+
+  Future<List<String>> uploadMultipleImages(List<dynamic> images, String path) async {
+    await Future.delayed(const Duration(seconds: 2));
+    // Retourne des URLs d'images placeholder
+    return List.generate(
+      images.length,
+      (index) => 'https://images.unsplash.com/photo-${1568605117036 + index}-5fe5e7bab0b7?w=800',
+    );
   }
 
   Future<void> deleteImage(String imageUrl) async {
-    // Simuler la suppression
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 300));
+    print('Image deleted: $imageUrl');
   }
 }
-
-
-
-
-
-
-
-
-

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
-import '../../services/mock_auth_service.dart';
-import '../../services/mongodb_auth_service.dart';
 import '../../models/user_model.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -23,32 +21,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    // Détecter automatiquement le service (mock, MongoDB, ou Firebase)
-    dynamic authService;
-    try {
-      authService = Provider.of<MockAuthService>(context, listen: false);
-    } catch (_) {
-      try {
-      authService = Provider.of<MongoDBAuthService>(context, listen: false);
-    } catch (_) {
-      authService = Provider.of<AuthService>(context, listen: false);
-    }
-    }
-    
+    final authService = Provider.of<AuthService>(context, listen: false);
     if (authService.currentUser != null) {
       final user = await authService.getUserData(authService.currentUser!.uid);
-      if (mounted) {
-        setState(() {
-          _user = user;
-          _isLoading = false;
-        });
-      }
-    } else {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      setState(() {
+        _user = user;
+        _isLoading = false;
+      });
     }
   }
 
@@ -352,14 +331,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              // Détecter automatiquement le service (mock ou réel)
-              dynamic authService;
-              try {
-                authService = Provider.of<MockAuthService>(context, listen: false);
-              } catch (_) {
-                authService = Provider.of<AuthService>(context, listen: false);
-              }
-              await authService.logout();
+              await Provider.of<AuthService>(context, listen: false).logout();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

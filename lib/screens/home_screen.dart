@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
-import '../services/mock_auth_service.dart';
-import '../services/mongodb_auth_service.dart';
 import '../models/user_model.dart';
 import 'buyer/vehicle_list_screen.dart';
 import 'buyer/modern_search_screen.dart';
@@ -25,64 +23,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Charger les données utilisateur immédiatement (synchrone pour mock)
     _loadUserData();
   }
 
-  void _loadUserData() {
-    // Détecter automatiquement le service (mock, MongoDB, ou Firebase)
-    try {
-      final mockAuth = Provider.of<MockAuthService>(context, listen: false);
-      // Pour MockAuthService, utiliser directement currentUser (synchrone)
+  Future<void> _loadUserData() async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    if (authService.currentUser != null) {
+      final user = await authService.getUserData(authService.currentUser!.uid);
       setState(() {
-        _currentUser = mockAuth.currentUser;
+        _currentUser = user;
         _isLoading = false;
       });
-      return;
-    } catch (_) {
-      // Pas MockAuthService
     }
-    
-    try {
-      final mongoAuth = Provider.of<MongoDBAuthService>(context, listen: false);
-      // Pour MongoDB, utiliser directement currentUser
-      setState(() {
-        _currentUser = mongoAuth.currentUser;
-        _isLoading = false;
-      });
-      return;
-    } catch (_) {
-      // Pas MongoDB
-    }
-    
-    try {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      if (authService.currentUser != null) {
-        // Pour AuthService (Firebase), charger de manière asynchrone
-        authService.getUserData(authService.currentUser!.uid).then((user) {
-          if (mounted) {
-            setState(() {
-              _currentUser = user;
-              _isLoading = false;
-            });
-          }
-        }).catchError((_) {
-          if (mounted) {
-            setState(() {
-              _isLoading = false;
-            });
-          }
-        });
-        return;
-      }
-    } catch (_) {
-      // Aucun service disponible
-    }
-    
-    // Si aucun utilisateur, arrêter le chargement
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   List<Widget> _getScreens() {
@@ -101,15 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Timeout de sécurité : après 1 seconde, arrêter le chargement
     if (_isLoading) {
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted && _isLoading) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      });
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
@@ -224,18 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              // Détecter automatiquement le service (mock, MongoDB, ou Firebase)
-              dynamic authService;
-              try {
-                authService = Provider.of<MockAuthService>(context, listen: false);
-              } catch (_) {
-                try {
-                  authService = Provider.of<MongoDBAuthService>(context, listen: false);
-                } catch (_) {
-                  authService = Provider.of<AuthService>(context, listen: false);
-                }
-              }
-              await authService.logout();
+              await Provider.of<AuthService>(context, listen: false).logout();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

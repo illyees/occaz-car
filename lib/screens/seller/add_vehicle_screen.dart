@@ -4,14 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../services/auth_service.dart';
-import '../../services/mock_auth_service.dart';
-import '../../services/mongodb_auth_service.dart';
 import '../../services/database_service.dart';
-import '../../services/mock_database_service.dart';
-import '../../services/mongodb_database_service.dart';
 import '../../services/storage_service.dart';
-import '../../services/mock_storage_service.dart';
-import '../../services/mongodb_storage_service.dart';
 import '../../models/vehicle_model.dart';
 // ignore: unused_import
 import '../../models/user_model.dart';
@@ -33,9 +27,8 @@ class _ModernAddVehicleScreenState extends State<ModernAddVehicleScreen> {
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
 
-  // Services seront détectés automatiquement (mock ou réel)
-  dynamic _dbService;
-  dynamic _storageService;
+  final DatabaseService _dbService = DatabaseService();
+  final StorageService _storageService = StorageService();
   final ImagePicker _picker = ImagePicker();
 
   List<File> _selectedImages = [];
@@ -100,40 +93,7 @@ class _ModernAddVehicleScreenState extends State<ModernAddVehicleScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Détecter automatiquement les services (mock, MongoDB, ou Firebase)
-      dynamic authService;
-      try {
-        authService = Provider.of<MockAuthService>(context, listen: false);
-      } catch (_) {
-        try {
-          authService = Provider.of<MongoDBAuthService>(context, listen: false);
-        } catch (_) {
-          authService = Provider.of<AuthService>(context, listen: false);
-        }
-      }
-      
-      // Détecter storage service
-      try {
-        _storageService = Provider.of<MockStorageService>(context, listen: false);
-      } catch (_) {
-        try {
-          _storageService = Provider.of<MongoDBStorageService>(context, listen: false);
-        } catch (_) {
-          _storageService = StorageService();
-        }
-      }
-      
-      // Détecter database service
-      try {
-        _dbService = Provider.of<MockDatabaseService>(context, listen: false);
-      } catch (_) {
-        try {
-          _dbService = Provider.of<MongoDBDatabaseService>(context, listen: false);
-        } catch (_) {
-          _dbService = DatabaseService();
-        }
-      }
-      
+      final authService = Provider.of<AuthService>(context, listen: false);
       final user = await authService.getUserData(authService.currentUser!.uid);
 
       List<String> imageUrls = await _storageService.uploadMultipleImages(

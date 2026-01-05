@@ -1,0 +1,334 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{tcolorbox}
+
+\geometry{left=2.5cm, right=2.5cm, top=3cm, bottom=3cm}
+
+% Configuration des couleurs
+\definecolor{primarycolor}{RGB}{41,128,185}
+\definecolor{secondarycolor}{RGB}{52,73,94}
+\definecolor{accentcolor}{RGB}{46,204,113}
+
+% Configuration des liens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primarycolor,
+    urlcolor=primarycolor,
+    citecolor=primarycolor
+}
+
+% En-tête et pied de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{primarycolor}{\textbf{OccazCar}}}
+\fancyhead[R]{\textcolor{secondarycolor}{Rapport Technique}}
+\fancyfoot[C]{\thepage}
+
+% Configuration des titres
+\titleformat{\section}{\Large\bfseries\color{primarycolor}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{secondarycolor}}{\thesubsection}{1em}{}
+
+\begin{document}
+
+% Page de titre
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge\bfseries\color{primarycolor} OccazCar\par}
+    \vspace{0.5cm}
+    {\Large\color{secondarycolor} Application Mobile de Petites Annonces Automobiles\par}
+    
+    \vspace{2cm}
+    
+    {\LARGE\bfseries Rapport Technique\par}
+    
+    \vspace{3cm}
+    
+    {\Large\textbf{Contributeurs}\par}
+    \vspace{0.5cm}
+    {\large
+    Bechir ZAMMOURI\\
+    Chayma ABASSI\\
+    Elyes SELLAMI\par}
+    
+    \vfill
+    
+    {\large Projet Flutter - Firebase\par}
+    {\large \today\par}
+\end{titlepage}
+
+% ============================================
+\section{Introduction}
+
+OccazCar est une application mobile multiplateforme développée avec Flutter, destinée à faciliter l'achat et la vente de véhicules d'occasion. L'application propose une interface moderne et intuitive permettant aux vendeurs de publier leurs annonces et aux acheteurs de rechercher des véhicules selon différents critères.
+
+% ============================================
+\section{Besoins Fonctionnels}
+
+\subsection{Authentification et Gestion des Utilisateurs}
+\begin{itemize}[leftmargin=*]
+    \item Inscription par email et mot de passe
+    \item Connexion sécurisée avec Firebase Authentication
+    \item Gestion du profil utilisateur
+    \item Déconnexion
+\end{itemize}
+
+\subsection{Fonctionnalités Vendeur}
+\begin{itemize}[leftmargin=*]
+    \item Publication d'annonces avec informations détaillées (marque, modèle, année, kilométrage, prix)
+    \item Upload multiple de photos via Firebase Storage
+    \item Géolocalisation automatique du véhicule
+    \item Modification des annonces existantes
+    \item Suppression d'annonces
+    \item Visualisation de toutes ses annonces
+\end{itemize}
+
+\subsection{Fonctionnalités Acheteur}
+\begin{itemize}[leftmargin=*]
+    \item Consultation de la liste complète des véhicules disponibles
+    \item Recherche avancée avec filtres multiples (marque, prix maximum, année minimale)
+    \item Visualisation détaillée d'un véhicule avec galerie photos
+    \item Localisation GPS du véhicule sur carte interactive
+    \item Contact direct du vendeur (appel téléphonique, SMS)
+\end{itemize}
+
+% ============================================
+\section{Besoins Non Fonctionnels}
+
+\subsection{Performance}
+\begin{itemize}[leftmargin=*]
+    \item Chargement optimisé des images avec mise en cache (cached\_network\_image)
+    \item Temps de réponse inférieur à 2 secondes pour les opérations courantes
+    \item Synchronisation en temps réel avec Firestore
+\end{itemize}
+
+\subsection{Sécurité}
+\begin{itemize}[leftmargin=*]
+    \item Authentification sécurisée via Firebase Authentication
+    \item Règles de sécurité Firestore pour protéger les données
+    \item Isolation des données utilisateurs
+    \item Validation côté client et serveur
+\end{itemize}
+
+\subsection{Disponibilité et Fiabilité}
+\begin{itemize}[leftmargin=*]
+    \item Infrastructure Firebase Cloud avec haute disponibilité (99.95\%)
+    \item Gestion des erreurs et feedback utilisateur
+    \item Mode hors ligne partiel avec cache local
+\end{itemize}
+
+\subsection{Compatibilité}
+\begin{itemize}[leftmargin=*]
+    \item Support Android et iOS
+    \item SDK Flutter minimum : 3.0.6
+    \item Design responsive et adaptatif
+    \item Material Design 3 pour une expérience utilisateur moderne
+\end{itemize}
+
+\subsection{Maintenabilité}
+\begin{itemize}[leftmargin=*]
+    \item Architecture modulaire avec séparation des responsabilités
+    \item Code organisé en couches (Models, Services, Screens)
+    \item Gestion d'état avec Provider
+    \item Documentation du code
+\end{itemize}
+
+% ============================================
+\section{Architecture Logicielle}
+
+\subsection{Architecture Logique}
+
+L'application adopte une \textbf{architecture en couches} inspirée du pattern \textbf{MVVM} (Model-View-ViewModel) via Provider :
+
+\begin{tcolorbox}[colback=primarycolor!5,colframe=primarycolor,title=Couches de l'Application]
+\begin{description}[leftmargin=2cm]
+    \item[Présentation] Interfaces utilisateur (Screens) développées avec Flutter Widgets
+    \item[Logique Métier] Services et Providers pour la gestion d'état et logique applicative
+    \item[Données] Modèles de données et accès aux sources externes (Firebase)
+    \item[Infrastructure] Services Firebase (Auth, Firestore, Storage)
+\end{description}
+\end{tcolorbox}
+
+\subsubsection{Structure des Composants}
+
+\textbf{1. Couche Modèles (Models)}
+\begin{itemize}
+    \item \texttt{UserModel} : Représentation des utilisateurs
+    \item \texttt{VehicleModel} : Entité véhicule avec 15 attributs (id, sellerId, brand, model, year, mileage, price, images, GPS, etc.)
+\end{itemize}
+
+\textbf{2. Couche Services}
+\begin{itemize}
+    \item \texttt{AuthService} : Gestion authentification et état utilisateur avec Provider
+    \item \texttt{DatabaseService} : CRUD véhicules, requêtes Firestore, recherche filtrée
+    \item \texttt{StorageService} : Upload/suppression images Firebase Storage
+\end{itemize}
+
+\textbf{3. Couche Présentation (Screens)}
+\begin{itemize}
+    \item \textbf{Auth} : LoginScreen, RegisterScreen
+    \item \textbf{Buyer} : VehicleListScreen, VehicleDetailScreen, ModernSearchScreen
+    \item \textbf{Seller} : AddVehicleScreen, EditVehicleScreen, MyVehiclesScreen
+    \item \textbf{Profile} : Gestion profil utilisateur
+    \item \textbf{Home} : Navigation principale
+\end{itemize}
+
+\textbf{4. Utilitaires}
+\begin{itemize}
+    \item \texttt{AppTheme} : Thème Material Design 3 centralisé
+    \item \texttt{AppColors} : Palette de couleurs cohérente
+\end{itemize}
+
+\subsection{Architecture Physique}
+
+\begin{tcolorbox}[colback=accentcolor!5,colframe=accentcolor,title=Infrastructure Déployée]
+\textbf{Architecture Client-Serveur Cloud}
+\end{tcolorbox}
+
+\subsubsection{Composants Physiques}
+
+\textbf{1. Client Mobile (Flutter)}
+\begin{itemize}
+    \item Application compilée nativement pour Android (ARM/x86) et iOS (ARM64)
+    \item Stockage local : Cache images, préférences utilisateur (SharedPreferences)
+    \item SDK Flutter avec Dart VM
+\end{itemize}
+
+\textbf{2. Backend Firebase (Google Cloud)}
+\begin{itemize}
+    \item \textbf{Firebase Authentication} : Serveurs d'authentification distribués
+    \item \textbf{Cloud Firestore} : Base de données NoSQL distribuée
+    \begin{itemize}
+        \item Collection \texttt{users} : Profils utilisateurs
+        \item Collection \texttt{vehicles} : Annonces véhicules
+    \end{itemize}
+    \item \textbf{Firebase Storage} : Stockage objet pour images (buckets régionaux)
+\end{itemize}
+
+\textbf{3. Services Tiers}
+\begin{itemize}
+    \item \textbf{Google Maps API} : Géolocalisation et cartographie
+    \item \textbf{Geolocator} : Récupération position GPS du device
+\end{itemize}
+
+\subsubsection{Flux de Communication}
+
+\begin{enumerate}
+    \item \textbf{Authentification} : App $\leftrightarrow$ Firebase Auth (HTTPS/REST)
+    \item \textbf{Données temps réel} : App $\leftrightarrow$ Firestore (WebSocket via gRPC)
+    \item \textbf{Images} : App $\leftrightarrow$ Firebase Storage (HTTPS)
+    \item \textbf{GPS} : App $\leftrightarrow$ Plateforme native $\leftrightarrow$ Google Maps API
+\end{enumerate}
+
+% ============================================
+\section{Technologies Utilisées}
+
+\subsection{Frontend}
+
+\begin{tcolorbox}[colback=secondarycolor!5,colframe=secondarycolor]
+\textbf{Flutter 3.0.6+} (Dart 3.0.6+)
+\begin{itemize}
+    \item Framework UI multiplateforme de Google
+    \item Compilation native (AOT) pour performance optimale
+    \item Hot Reload pour développement rapide
+    \item Widgets Material Design 3
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{Backend et Services}
+
+\begin{description}[leftmargin=3cm,style=nextline]
+    \item[\texttt{firebase\_core}] Initialisation SDK Firebase
+    \item[\texttt{firebase\_auth}] Authentification utilisateurs (email/password)
+    \item[\texttt{cloud\_firestore}] Base de données NoSQL temps réel
+    \item[\texttt{firebase\_storage}] Stockage cloud pour images
+\end{description}
+
+\subsection{Gestion d'État et Navigation}
+
+\begin{description}[leftmargin=3cm,style=nextline]
+    \item[\texttt{provider}] Pattern Observer pour gestion d'état réactive
+\end{description}
+
+\subsection{Fonctionnalités Métier}
+
+\begin{description}[leftmargin=3cm,style=nextline]
+    \item[\texttt{image\_picker}] Sélection photos depuis galerie/caméra
+    \item[\texttt{geolocator}] Géolocalisation GPS du device
+    \item[\texttt{url\_launcher}] Lancement appels/SMS vers vendeurs
+    \item[\texttt{cached\_network\_image}] Cache intelligent images réseau
+    \item[\texttt{intl}] Internationalisation et formatage dates/nombres
+\end{description}
+
+\subsection{Outils de Développement}
+
+\begin{description}[leftmargin=3cm,style=nextline]
+    \item[\texttt{flutter\_lints}] Règles de qualité code Dart
+    \item[\texttt{flutter\_test}] Framework de tests unitaires et widgets
+\end{description}
+
+\subsection{Infrastructure}
+
+\begin{itemize}
+    \item \textbf{Google Cloud Platform} : Hébergement Firebase
+    \item \textbf{Android Studio / Xcode} : Compilation native
+    \item \textbf{Git} : Contrôle de version
+\end{itemize}
+
+% ============================================
+\section{Modèle de Données}
+
+\subsection{Collection Firestore : \texttt{vehicles}}
+
+\begin{small}
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Description} \\
+\hline
+id & String & Identifiant unique (auto-généré) \\
+sellerId & String & ID utilisateur vendeur \\
+sellerName & String & Nom du vendeur \\
+sellerPhone & String & Téléphone du vendeur \\
+brand & String & Marque du véhicule \\
+model & String & Modèle du véhicule \\
+year & Integer & Année de fabrication \\
+mileage & Integer & Kilométrage \\
+price & Double & Prix en devise locale \\
+description & String & Description détaillée \\
+images & Array<String> & URLs des photos \\
+latitude & Double & Coordonnée GPS \\
+longitude & Double & Coordonnée GPS \\
+location & String & Adresse textuelle \\
+createdAt & Timestamp & Date de création \\
+status & String & Statut (active/sold/deleted) \\
+\hline
+\end{tabular}
+\end{small}
+
+% ============================================
+\section{Conclusion}
+
+OccazCar est une solution moderne et complète pour la gestion de petites annonces automobiles. L'architecture choisie offre :
+
+\begin{itemize}
+    \item \textbf{Scalabilité} : Infrastructure Firebase cloud élastique
+    \item \textbf{Maintenabilité} : Code modulaire et bien structuré
+    \item \textbf{Performance} : Compilation native et optimisations
+    \item \textbf{Expérience utilisateur} : Interface fluide et responsive
+\end{itemize}
+
+L'utilisation de Flutter et Firebase permet un développement rapide tout en garantissant une application professionnelle et performante sur Android et iOS.
+
+\end{document}

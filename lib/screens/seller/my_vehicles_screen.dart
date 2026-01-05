@@ -2,52 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../services/auth_service.dart';
-import '../../services/mock_auth_service.dart';
-import '../../services/mongodb_auth_service.dart';
 import '../../services/database_service.dart';
-import '../../services/mock_database_service.dart';
-import '../../services/mongodb_database_service.dart';
 import '../../models/vehicle_model.dart';
 import 'edit_vehicle_screen.dart';
 import '../buyer/vehicle_detail_screen.dart';
 
 class MyVehiclesScreen extends StatelessWidget {
+  final DatabaseService _dbService = DatabaseService();
   final NumberFormat currencyFormat =
       NumberFormat.currency(locale: 'fr_FR', symbol: '€', decimalDigits: 0);
 
   MyVehiclesScreen({Key? key}) : super(key: key);
 
-  dynamic _getAuthService(BuildContext context) {
-    try {
-      return Provider.of<MockAuthService>(context, listen: false);
-    } catch (_) {
-      try {
-        return Provider.of<MongoDBAuthService>(context, listen: false);
-      } catch (_) {
-        return Provider.of<AuthService>(context, listen: false);
-      }
-    }
-  }
-
-  dynamic _getDbService(BuildContext context) {
-    try {
-      return Provider.of<MockDatabaseService>(context, listen: false);
-    } catch (_) {
-      try {
-        return Provider.of<MongoDBDatabaseService>(context, listen: false);
-      } catch (_) {
-        return DatabaseService();
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final authService = _getAuthService(context);
-    final dbService = _getDbService(context);
+    final authService = Provider.of<AuthService>(context);
 
     return StreamBuilder<List<Vehicle>>(
-      stream: dbService.getVehiclesBySeller(authService.currentUser!.uid),
+      stream: _dbService.getVehiclesBySeller(authService.currentUser!.uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -236,8 +208,7 @@ class MyVehiclesScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              final dbService = _getDbService(context);
-              await dbService.deleteVehicle(vehicleId);
+              await _dbService.deleteVehicle(vehicleId);
               // ignore: use_build_context_synchronously
               Navigator.pop(context);
               // ignore: use_build_context_synchronously

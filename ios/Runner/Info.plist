@@ -47,12 +47,5 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<!-- Permissions nécessaires -->
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Nous avons besoin de votre localisation pour afficher les véhicules à proximité</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Nous avons besoin d'accéder à vos photos pour ajouter des images de véhicules</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Nous avons besoin d'accéder à votre caméra pour prendre des photos de véhicules</string>
 </dict>
 </plist>

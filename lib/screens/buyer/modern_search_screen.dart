@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../services/database_service.dart';
-import '../../services/mock_database_service.dart';
-import '../../services/mongodb_database_service.dart';
 import '../../models/vehicle_model.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
@@ -15,17 +12,7 @@ class ModernSearchScreen extends StatefulWidget {
 }
 
 class _ModernSearchScreenState extends State<ModernSearchScreen> {
-  dynamic _getDbService(BuildContext context) {
-    try {
-      return Provider.of<MockDatabaseService>(context, listen: false);
-    } catch (_) {
-      try {
-        return Provider.of<MongoDBDatabaseService>(context, listen: false);
-      } catch (_) {
-        return DatabaseService();
-      }
-    }
-  }
+  final DatabaseService _dbService = DatabaseService();
   final TextEditingController _searchController = TextEditingController();
   final NumberFormat currencyFormat =
       NumberFormat.currency(locale: 'fr_FR', symbol: '€', decimalDigits: 0);
@@ -153,7 +140,7 @@ class _ModernSearchScreenState extends State<ModernSearchScreen> {
             // Résultats
             Expanded(
               child: StreamBuilder<List<Vehicle>>(
-                stream: _getDbService(context).searchVehicles(
+                stream: _dbService.searchVehicles(
                   brand: _selectedBrand == 'Toutes' ? null : _selectedBrand,
                   maxPrice: _maxPrice,
                   minYear: _minYear,

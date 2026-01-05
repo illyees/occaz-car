@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
-import 'mock_service.dart';
 
-/// Service d'authentification mock pour tester sans Firebase
 class MockAuthService extends ChangeNotifier {
   UserModel? _currentUser;
-  bool _isLoggedIn = false;
-
+  
   UserModel? get currentUser => _currentUser;
   
-  // Stream mocké pour simuler les changements d'état
-  Stream<UserModel?> get authStateChanges {
-    // Retourner un stream qui émet la valeur actuelle
-    return Stream.value(_currentUser);
+  Stream<UserModel?> get authStateChanges async* {
+    await Future.delayed(const Duration(milliseconds: 500));
+    yield _currentUser;
   }
 
   Future<String?> register({
@@ -22,59 +18,69 @@ class MockAuthService extends ChangeNotifier {
     required String phone,
     required bool isSeller,
   }) async {
-    // Simuler un délai réseau
     await Future.delayed(const Duration(seconds: 1));
     
     _currentUser = UserModel(
-      id: 'mock_${DateTime.now().millisecondsSinceEpoch}',
+      id: 'mock-user-${DateTime.now().millisecondsSinceEpoch}',
       email: email,
       name: name,
       phone: phone,
       isSeller: isSeller,
       createdAt: DateTime.now(),
     );
-    
-    _isLoggedIn = true;
     notifyListeners();
-    return null; // Pas d'erreur
+    return null;
   }
 
-  Future<String?> login(String email, String password) async {
-    // Simuler un délai réseau
+  Future<String?> signIn({
+    required String email,
+    required String password,
+  }) async {
     await Future.delayed(const Duration(seconds: 1));
     
-    // Pour la démo, accepter n'importe quel email/mot de passe
-    // ou utiliser des comptes prédéfinis
-    if (email.contains('vendeur') || email.contains('seller')) {
-      _currentUser = MockService.getMockUser(isSeller: true);
-    } else {
-      _currentUser = MockService.getMockUser(isSeller: false);
-    }
-    
-    _isLoggedIn = true;
+    // Mock user pour test
+    _currentUser = UserModel(
+      id: 'mock-user-123',
+      email: email,
+      name: 'Utilisateur Test',
+      phone: '+216 12 345 678',
+      isSeller: true,
+      createdAt: DateTime.now(),
+    );
     notifyListeners();
-    return null; // Pas d'erreur
+    return null;
   }
 
-  Future<void> logout() async {
+  Future<void> signOut() async {
     _currentUser = null;
-    _isLoggedIn = false;
     notifyListeners();
   }
 
-  Future<UserModel?> getUserData(String uid) async {
-    // Retourner immédiatement l'utilisateur actuel (pas de délai)
-    return _currentUser;
+  Future<String?> resetPassword(String email) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return null;
   }
-  
-  // Méthode synchrone pour obtenir l'utilisateur directement
-  UserModel? getUserDataSync() {
+
+  Future<String?> updateProfile({
+    required String name,
+    required String phone,
+  }) async {
+    if (_currentUser != null) {
+      _currentUser = UserModel(
+        id: _currentUser!.id,
+        email: _currentUser!.email,
+        name: name,
+        phone: phone,
+        isSeller: _currentUser!.isSeller,
+        createdAt: _currentUser!.createdAt,
+      );
+      notifyListeners();
+    }
+    return null;
+  }
+
+  Future<UserModel?> getUserData(String userId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
     return _currentUser;
   }
 }
-
-
-
-
-
-

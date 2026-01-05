@@ -1,36 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import '../../services/database_service.dart';
-import '../../services/mock_database_service.dart';
-import '../../services/mongodb_database_service.dart';
 import '../../models/vehicle_model.dart';
 import 'vehicle_detail_screen.dart';
 
 class VehicleListScreen extends StatelessWidget {
-  VehicleListScreen({Key? key}) : super(key: key);
+  final DatabaseService _dbService = DatabaseService();
 
-  dynamic _getDbService(BuildContext context) {
-    // Essayer d'obtenir le service mock d'abord
-    try {
-      return Provider.of<MockDatabaseService>(context, listen: false);
-    } catch (_) {
-      // Essayer MongoDB
-      try {
-        return Provider.of<MongoDBDatabaseService>(context, listen: false);
-      } catch (_) {
-        // Sinon utiliser le service Firebase
-        return DatabaseService();
-      }
-    }
-  }
+  VehicleListScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final dbService = _getDbService(context);
     return StreamBuilder<List<Vehicle>>(
-      stream: dbService.getAllVehicles(),
+      stream: _dbService.getAllVehicles(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

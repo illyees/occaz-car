@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Vehicle {
   final String id;
   final String sellerId;
@@ -35,48 +37,10 @@ class Vehicle {
     this.status = 'active',
   });
 
-  // Factory pour créer depuis un document MongoDB
-  factory Vehicle.fromMongo(Map<String, dynamic> doc) {
+  factory Vehicle.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map<String, dynamic>;
     return Vehicle(
-      id: doc['_id']?.toString() ?? '',
-      sellerId: doc['sellerId'] ?? '',
-      sellerName: doc['sellerName'] ?? '',
-      sellerPhone: doc['sellerPhone'] ?? '',
-      brand: doc['brand'] ?? '',
-      model: doc['model'] ?? '',
-      year: doc['year'] ?? 0,
-      mileage: doc['mileage'] ?? 0,
-      price: (doc['price'] ?? 0).toDouble(),
-      description: doc['description'] ?? '',
-      images: List<String>.from(doc['images'] ?? []),
-      latitude: doc['latitude']?.toDouble(),
-      longitude: doc['longitude']?.toDouble(),
-      location: doc['location'],
-      createdAt: doc['createdAt'] != null 
-          ? (doc['createdAt'] is String 
-              ? DateTime.parse(doc['createdAt'])
-              : doc['createdAt'])
-          : DateTime.now(),
-      status: doc['status'] ?? 'active',
-    );
-  }
-
-  // Factory pour compatibilité Firestore (si nécessaire)
-  factory Vehicle.fromFirestore(dynamic doc) {
-    Map<String, dynamic> data;
-    String docId;
-    
-    if (doc is Map<String, dynamic>) {
-      data = doc;
-      docId = doc['_id']?.toString() ?? '';
-    } else {
-      // Compatibilité avec Firestore DocumentSnapshot
-      data = doc.data() as Map<String, dynamic>;
-      docId = doc.id;
-    }
-    
-    return Vehicle(
-      id: docId,
+      id: doc.id,
       sellerId: data['sellerId'] ?? '',
       sellerName: data['sellerName'] ?? '',
       sellerPhone: data['sellerPhone'] ?? '',
@@ -90,11 +54,7 @@ class Vehicle {
       latitude: data['latitude']?.toDouble(),
       longitude: data['longitude']?.toDouble(),
       location: data['location'],
-      createdAt: data['createdAt'] != null
-          ? (data['createdAt'] is String
-              ? DateTime.parse(data['createdAt'])
-              : (data['createdAt'] as dynamic).toDate())
-          : DateTime.now(),
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
       status: data['status'] ?? 'active',
     );
   }
@@ -114,7 +74,7 @@ class Vehicle {
       'latitude': latitude,
       'longitude': longitude,
       'location': location,
-      'createdAt': createdAt.toIso8601String(), // Format ISO pour MongoDB
+      'createdAt': Timestamp.fromDate(createdAt),
       'status': status,
     };
   }
