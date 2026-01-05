@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class VehicleDetailsScreen extends StatelessWidget {
+class VehicleDetailsScreen extends StatefulWidget {
   const VehicleDetailsScreen({super.key});
+
+  @override
+  State<VehicleDetailsScreen> createState() => _VehicleDetailsScreenState();
+}
+
+class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
+  int _currentImageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final vehicle = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final images = vehicle['images'] as List<dynamic>? ?? [vehicle['image']];
 
     return Scaffold(
       body: CustomScrollView(
@@ -18,13 +26,23 @@ class VehicleDetailsScreen extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    vehicle['image'],
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.directions_car, size: 100),
+                  PageView.builder(
+                    itemCount: images.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        images[index],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.directions_car, size: 100),
+                          );
+                        },
                       );
                     },
                   ),
@@ -40,6 +58,29 @@ class VehicleDetailsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (images.length > 1)
+                    Positioned(
+                      bottom: 16,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          images.length,
+                          (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentImageIndex == index
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -211,9 +252,32 @@ class VehicleDetailsScreen extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: FilledButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  print('Bouton Contacter cliqué !');
+                  final tel = vehicle['vendeurTel'] ?? 'Non disponible';
+                  final nom = vehicle['vendeurNom'] ?? 'Vendeur';
+                  print('Tel: $tel, Nom: $nom');
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Vendeur: $nom\nTéléphone: $tel'),
+                      duration: const Duration(seconds: 5),
+                      action: SnackBarAction(
+                        label: 'Appeler',
+                        onPressed: () async {
+                          if (tel != 'Non disponible') {
+                            final uri = Uri.parse('tel:$tel');
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.message),
-                label: const Text('Message'),
+                label: const Text('Contacter'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
